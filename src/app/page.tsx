@@ -1,5 +1,7 @@
 'use client'
+import { useApi } from "@/assets/utils/customHooks/useAxios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 interface FormData {
@@ -9,6 +11,8 @@ interface FormData {
 }
 
 export default function Home() {
+  const {data, error, isLoading, post} = useApi();
+  const router = useRouter()
 
   const [formData, setFormData] = React.useState<FormData>({
     name : '',
@@ -21,9 +25,23 @@ export default function Home() {
     })
   }
 
-  const handleOnSubmit = (e: React.FormEvent) => {
+  const handleOnSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('submit', formData);
+    
+    try {
+      await post('/auth/signup', formData)
+      router.push('notes')
+      
+    } catch (error) {
+      console.log(error);
+    }
+
+    setFormData({
+      name: '',
+      email : '',
+      password : ''
+    })
+    
   } 
   
   return (
